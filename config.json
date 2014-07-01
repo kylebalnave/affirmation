@@ -1,0 +1,16 @@
+{
+	"w3cServiceUrl" : "http://validator.w3.org/check",
+	"urls": [
+		"http://www.madebypi.co.uk/"
+	],
+	"ignore": [
+		"Syntax of list of link-type keywords",
+		"Mistakes that can cause this error include"
+	],
+	"reports": [
+		{
+			"className" : "semblance.reporters.JunitReport",
+			"out" : "./reports/w3c.junit"
+		}
+	]
+}	

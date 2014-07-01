@@ -17,11 +17,14 @@
 package affirmation;
 
 import affirmation.runners.AffirmationRunner;
-import io.URLReader;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.Map;
-import semblance.Config;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import semblance.io.URLReader;
+import semblance.reporters.Report;
+import semblance.reporters.SystemLogReport;
+import semblance.results.IResult;
 
 /**
  * Uses the W3C web-service to validate a source file
@@ -42,16 +45,23 @@ public class Affirmation {
             if (args.length >= argIndex + 1) {
                 if (arg.equalsIgnoreCase("-cf") || arg.equalsIgnoreCase("-config")) {
                     configUrlOrFilePath = args[argIndex + 1];
-                } else if (arg.equalsIgnoreCase("-act") || arg.equalsIgnoreCase("-action")) {
-                    action = args[argIndex + 1];
                 } else if (arg.equalsIgnoreCase("-proxy")) {
                     URLReader.setProxyDetails(args[argIndex + 1], Integer.valueOf(args[argIndex + 2]));
                 }
             }
             argIndex++;
         }
-        Config cf = new Config(new File(configUrlOrFilePath));
-        AffirmationRunner affirmationRunner = new AffirmationRunner((Map) cf.getNestedValue("root"));
+        AffirmationRunner runner = new AffirmationRunner(configUrlOrFilePath);
+        try {
+            List<IResult> results = runner.run();
+            runner.report();
+            //
+            // log the summary of all results
+            Report report = new SystemLogReport(results);
+            report.out();
+        } catch (Exception ex) {
+            Logger.getLogger(AffirmationRunner.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
 }

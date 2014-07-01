@@ -17,9 +17,6 @@
 package affirmation.runners;
 
 import affirmation.results.AffirmationResult;
-import io.IReader;
-import io.MultipartURLWriter;
-import io.ReaderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +30,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import semblance.io.IReader;
+import semblance.io.MultipartURLWriter;
+import semblance.io.ReaderFactory;
 import semblance.results.IResult;
 import semblance.runners.Runner;
 
@@ -49,6 +49,10 @@ public class AffirmationRunner extends Runner {
         super(config);
     }
 
+    public AffirmationRunner(String configUrlOrFilePath) {
+        super(configUrlOrFilePath);
+    }
+
     @Override
     public List<IResult> run() throws Exception {
         String w3cServiceUrl = (String) getConfigValue("w3cServiceUrl", "");
@@ -58,7 +62,7 @@ public class AffirmationRunner extends Runner {
         // loop through each url
         for (final String url : urls) {
             IReader reader = rf.getReader(url);
-            String html = reader.load(url);
+            String html = reader.load();
             if (!html.isEmpty()) {
                 MultipartURLWriter loader = new MultipartURLWriter(w3cServiceUrl, "UTF-8");
                 loader.addFormField("output", "soap12");
