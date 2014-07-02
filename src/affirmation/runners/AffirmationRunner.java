@@ -16,7 +16,6 @@
  */
 package affirmation.runners;
 
-import affirmation.results.AffirmationResult;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +32,10 @@ import org.xml.sax.SAXException;
 import semblance.io.IReader;
 import semblance.io.MultipartURLWriter;
 import semblance.io.ReaderFactory;
+import semblance.results.ErrorResult;
+import semblance.results.FailResult;
 import semblance.results.IResult;
+import semblance.results.PassResult;
 import semblance.runners.Runner;
 
 /**
@@ -49,12 +51,18 @@ public class AffirmationRunner extends Runner {
     public static final String KEY_URLS = "urls";
     public static final String KEY_MESSAGES_TO_IGNORE = "ignore";
 
-    private final ReaderFactory rf = new ReaderFactory();
-
+    /**
+     * Constructor
+     * @param config 
+     */
     public AffirmationRunner(Map<String, Object> config) {
         super(config);
     }
-
+    
+    /**
+     * Constructor
+     * @param configUrlOrFilePath
+     */
     public AffirmationRunner(String configUrlOrFilePath) {
         super(configUrlOrFilePath);
     }
@@ -67,7 +75,7 @@ public class AffirmationRunner extends Runner {
         //
         // loop through each url
         for (final String url : urls) {
-            IReader reader = rf.getReader(url);
+            IReader reader = ReaderFactory.getReader(url);
             String html = reader.load();
             if (!html.isEmpty()) {
                 MultipartURLWriter loader = new MultipartURLWriter(w3cServiceUrl, "UTF-8");
@@ -82,13 +90,16 @@ public class AffirmationRunner extends Runner {
                 results.addAll(getWarningsOrError(document.getElementsByTagName("m:error"), url, true, ignoreMessages));
                 results.addAll(getWarningsOrError(document.getElementsByTagName("m:warning"), url, true, ignoreMessages));
                 if (elementList.getLength() == 1) {
-                    boolean isValid = elementList.item(0).getTextContent().equalsIgnoreCase("true");
-                    results.add(new AffirmationResult(url, isValid, "Validity is " + isValid));
+                    if(elementList.item(0).getTextContent().equalsIgnoreCase("true")) {
+                        results.add(new PassResult(url, "The file is valid.  You have Affirmation!"));
+                    } else {
+                        results.add(new FailResult(url, "The file is invalid.  Better luck next time!"));
+                    }
                 } else {
-                    results.add(new AffirmationResult(url, false, "No m:validity node found"));
+                    results.add(new ErrorResult(url, "No m:validity node found"));
                 }
             } else {
-                results.add(new AffirmationResult(url, false, "File response is empty"));
+                results.add(new ErrorResult(url, "File response is empty"));
             }
             // sleep for 1000ms as requested by W3C API
             Thread.sleep(1000);
@@ -96,8 +107,8 @@ public class AffirmationRunner extends Runner {
         return results;
     }
 
-    private List<AffirmationResult> getWarningsOrError(NodeList list, String url, boolean fail, List<String> ignoreList) {
-        List<AffirmationResult> tmpResults = new ArrayList<AffirmationResult>();
+    private List<IResult> getWarningsOrError(NodeList list, String url, boolean fail, List<String> ignoreList) {
+        List<IResult> tmpResults = new ArrayList<IResult>();
         for (int i = 0; i < list.getLength(); i++) {
             Node item = list.item(i);
             NodeList children = item.getChildNodes();
@@ -128,13 +139,10 @@ public class AffirmationRunner extends Runner {
                     }
                 }
             }
-            if (!ignoreThisResult) {
-                tmpResults.add(new AffirmationResult(url,
-                        !fail,
-                        reason,
-                        msg,
-                        lineInt,
-                        paraInt));
+            if (!ignoreThisResult && fail) {
+                tmpResults.add(new FailResult(url,reason,msg,lineInt,paraInt));
+            } else if (!ignoreThisResult && !fail) {
+                tmpResults.add(new PassResult(url,reason,msg,lineInt,paraInt));
             }
         }
         return tmpResults;

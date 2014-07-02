@@ -21,6 +21,7 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import semblance.args.ArgsHelper;
 import semblance.io.URLReader;
 import semblance.reporters.Report;
 import semblance.reporters.SystemLogReport;
@@ -38,18 +39,12 @@ public class Affirmation {
      * @throws java.io.FileNotFoundException
      */
     public static void main(String[] args) throws FileNotFoundException {
-        String configUrlOrFilePath = "./config.json";
-        String action = "dist";
-        int argIndex = 0;
-        for (String arg : args) {
-            if (args.length >= argIndex + 1) {
-                if (arg.equalsIgnoreCase("-cf") || arg.equalsIgnoreCase("-config")) {
-                    configUrlOrFilePath = args[argIndex + 1];
-                } else if (arg.equalsIgnoreCase("-proxy")) {
-                    URLReader.setProxyDetails(args[argIndex + 1], Integer.valueOf(args[argIndex + 2]));
-                }
-            }
-            argIndex++;
+        String configUrlOrFilePath = ArgsHelper.getFirstArgMatching(args, new String[]{"-cf", "-config"}, "./config.json");
+        String action = ArgsHelper.getFirstArgMatching(args, new String[]{"-act", "-action"}, "dist");
+        String proxy = ArgsHelper.getArgMatching(args, "proxy", "");
+        String[] proxyParts = proxy.split(":");
+        if(proxyParts.length == 2) {
+            URLReader.setProxyDetails(proxyParts[0], Integer.valueOf(proxyParts[1]));
         }
         AffirmationRunner runner = new AffirmationRunner(configUrlOrFilePath);
         try {
