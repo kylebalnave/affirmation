@@ -42,10 +42,16 @@ import semblance.runners.Runner;
  * @author balnave
  */
 public class AffirmationRunner extends Runner {
+    
+    public static final String KEY_W3C_SERVICES = "services";
+    public static final String KEY_W3C_HTML_SERVICES = "html";
+    public static final String KEY_W3C_CSS_SERVICES = "css";
+    public static final String KEY_URLS = "urls";
+    public static final String KEY_MESSAGES_TO_IGNORE = "ignore";
 
     private final ReaderFactory rf = new ReaderFactory();
 
-    public AffirmationRunner(Map config) {
+    public AffirmationRunner(Map<String, Object> config) {
         super(config);
     }
 
@@ -56,8 +62,8 @@ public class AffirmationRunner extends Runner {
     @Override
     public List<IResult> run() throws Exception {
         String w3cServiceUrl = (String) getConfigValue("w3cServiceUrl", "");
-        List<String> urls = (List<String>) getConfigValue("urls", new ArrayList());
-        List<String> ignoreMessages = (List<String>) getConfigValue("ignore", new ArrayList());
+        List<String> urls = (List<String>) getConfigValue(KEY_URLS, new ArrayList<String>());
+        List<String> ignoreMessages = (List<String>) getConfigValue(KEY_MESSAGES_TO_IGNORE, new ArrayList<String>());
         //
         // loop through each url
         for (final String url : urls) {
@@ -84,7 +90,7 @@ public class AffirmationRunner extends Runner {
             } else {
                 results.add(new AffirmationResult(url, false, "File response is empty"));
             }
-            // sleep for 100ms as requested by W3C API
+            // sleep for 1000ms as requested by W3C API
             Thread.sleep(1000);
         }
         return results;
