@@ -76,7 +76,7 @@ public class AffirmationRunner extends Runner {
                 loader.addFormField("charset", "UTF-8");
                 loader.addFormField("doctype", "inline");
                 loader.addFilePart("uploaded_file", url.endsWith("/") ? url + "index.html" : url, html);
-                String response = loader.finish();
+                String response = loader.sendAndReceive();
                 Document document = parseSoapResponse(response);
                 NodeList elementList = document.getElementsByTagName("m:validity");
                 results.addAll(getWarningsOrError(document.getElementsByTagName("m:error"), url, true, ignoreMessages));
