@@ -75,7 +75,7 @@ public class AffirmationRunner extends Runner {
     }
 
     @Override
-    public List<IResult> run() throws Exception {
+    public List<IResult> call() throws Exception {
         String w3cServiceUrl = (String) getConfigValue("w3cServiceUrl", "");
         List<String> urls = (List<String>) getConfigValue(KEY_URLS, new ArrayList<String>());
         List<String> ignoreMessages = (List<String>) getConfigValue(KEY_MESSAGES_TO_IGNORE, new ArrayList<String>());
