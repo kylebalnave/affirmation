@@ -11,6 +11,14 @@
 		{
 			"className" : "semblance.reporters.JunitReport",
 			"out" : "./reports/w3c.junit"
+		},
+                {
+			"className" : "semblance.reporters.XmlReport",
+			"out" : "./reports/w3c.xml"
+		},
+                {
+			"className" : "semblance.reporters.SystemLogReport",
+			"out" : "./reports/log.txt"
 		}
 	]
 }	

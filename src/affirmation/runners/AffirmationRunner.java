@@ -25,6 +25,8 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import org.htmlcleaner.HtmlCleaner;
+import org.htmlcleaner.TagNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -39,18 +41,19 @@ import semblance.results.PassResult;
 import semblance.runners.Runner;
 
 /**
- * Uses the W3C web-service to validate a source file
+ * Uses the W3C web-service to validate a source file A single Thread so we
+ * don't hit the service too hard I'm nice like that
  *
  * @author balnave
  */
 public class AffirmationRunner extends Runner {
-    
+
     public static final String KEY_W3C_SERVICES = "services";
     public static final String KEY_W3C_HTML_SERVICES = "html";
     public static final String KEY_W3C_CSS_SERVICES = "css";
     public static final String KEY_URLS = "urls";
     public static final String KEY_MESSAGES_TO_IGNORE = "ignore";
-    
+
     /**
      * @param args the command line arguments
      */
@@ -60,14 +63,16 @@ public class AffirmationRunner extends Runner {
 
     /**
      * Constructor
-     * @param config 
+     *
+     * @param config
      */
     public AffirmationRunner(Map<String, Object> config) {
         super(config);
     }
-    
+
     /**
      * Constructor
+     *
      * @param configUrlOrFilePath
      */
     public AffirmationRunner(String configUrlOrFilePath) {
@@ -86,25 +91,29 @@ public class AffirmationRunner extends Runner {
             String html = reader.load();
             if (!html.isEmpty()) {
                 MultipartURLWriter loader = new MultipartURLWriter(w3cServiceUrl, "UTF-8");
-                loader.addFormField("output", "soap12");
+                //loader.addFormField("output", "soap12");
                 loader.addFormField("outline", "1");
                 loader.addFormField("charset", "UTF-8");
                 loader.addFormField("doctype", "inline");
                 loader.addFilePart("uploaded_file", url.endsWith("/") ? url + "index.html" : url, html);
                 String response = loader.sendAndReceive();
-                Document document = parseSoapResponse(response);
-                NodeList elementList = document.getElementsByTagName("m:validity");
-                results.addAll(getWarningsOrError(document.getElementsByTagName("m:error"), url, true, ignoreMessages));
-                results.addAll(getWarningsOrError(document.getElementsByTagName("m:warning"), url, true, ignoreMessages));
-                if (elementList.getLength() == 1) {
-                    if(elementList.item(0).getTextContent().equalsIgnoreCase("true")) {
-                        results.add(new PassResult(url, "The file is valid.  You have Affirmation!"));
-                    } else {
-                        results.add(new FailResult(url, "The file is invalid.  Better luck next time!"));
-                    }
+                //
+                boolean isValidHtml = false;
+                // create an instance of HtmlCleaner
+                HtmlCleaner cleaner = new HtmlCleaner();
+                TagNode dom = cleaner.clean(response);
+                TagNode[] nodes = dom.getElementsByAttValue("id", "results", true, true);
+                if (nodes.length == 1 && nodes[0].getAttributeByName("class").contains("valid")) {
+                    isValidHtml = true;
+                } else if (nodes.length == 1) {
+                    results.add(new ErrorResult(url, String.format("Invalid markup '%s'", nodes[0].getText())));
                 } else {
-                    results.add(new ErrorResult(url, "No m:validity node found"));
+                    results.add(new ErrorResult(url, "Expecting a single #results node"));
                 }
+                //
+                // Add Validation Errors and Warnings
+                addFailures(dom, url);
+                addWarnings(dom, url);
             } else {
                 results.add(new ErrorResult(url, "File response is empty"));
             }
@@ -114,66 +123,45 @@ public class AffirmationRunner extends Runner {
         return results;
     }
 
-    private List<IResult> getWarningsOrError(NodeList list, String url, boolean fail, List<String> ignoreList) {
-        List<IResult> tmpResults = new ArrayList<IResult>();
-        for (int i = 0; i < list.getLength(); i++) {
-            Node item = list.item(i);
-            NodeList children = item.getChildNodes();
+    private void addFailures(TagNode dom, String url) {
+        TagNode[] errors = dom.getElementsByAttValue("class", "msg_err", true, true);
+        for (TagNode node : errors) {
+            String em = "";
             String msg = "";
-            String reason = "";
-            int lineInt = 0;
-            int paraInt = 0;
-            for (int j = 0; j < children.getLength(); j++) {
-                Node child = children.item(j);
-                String childText = child.getTextContent();
-                if (child.getNodeName().equalsIgnoreCase("m:line")) {
-                    lineInt = Integer.valueOf(childText.isEmpty() ? "0" : childText);
-                } else if (child.getNodeName().equalsIgnoreCase("m:col")) {
-                    paraInt = Integer.valueOf(childText.isEmpty() ? "0" : childText);
-                } else if (child.getNodeName().equalsIgnoreCase("m:message")) {
-                    msg = childText;
-                } else if (child.getNodeName().equalsIgnoreCase("m:explanation")) {
-                    reason = childText;
+            String pre = "";
+            for (TagNode child : node.getChildTags()) {
+                String tName = child.getName();
+                String tText = child.getText().toString();
+                if (em.isEmpty()) {
+                    em = tName.equalsIgnoreCase("em") ? tText : "";
+                }
+                if (msg.isEmpty()) {
+                    msg = tName.equalsIgnoreCase("span") && child.getAttributeByName("class").contains("msg") ? tText : "";
+                }
+                if (pre.isEmpty()) {
+                    pre = tName.equalsIgnoreCase("pre") ? tText : "";
                 }
             }
-            boolean ignoreThisResult = false;
-            if (ignoreList != null) {
-                for (String ignoreMsg : ignoreList) {
-                    if (msg.toLowerCase().contains(ignoreMsg.toLowerCase()) 
-                            || reason.toLowerCase().contains(ignoreMsg.toLowerCase())) {
-                        ignoreThisResult = true;
-                        break;
-                    }
+            results.add(new FailResult(url, pre, msg));
+        }
+    }
+
+    private void addWarnings(TagNode dom, String url) {
+        TagNode[] warnings = dom.getElementsByAttValue("class", "msg_warn", true, true);
+        for (TagNode node : warnings) {
+            String em = "";
+            String msg = "";
+            for (TagNode child : node.getChildTags()) {
+                String tName = child.getName();
+                String tText = child.getText().toString();
+                if (em.isEmpty()) {
+                    em = tName.equalsIgnoreCase("em") ? tText : "";
+                }
+                if (msg.isEmpty()) {
+                    msg = tName.equalsIgnoreCase("span") && child.getAttributeByName("class").contains("msg") ? tText : "";
                 }
             }
-            if (!ignoreThisResult && fail) {
-                tmpResults.add(new FailResult(url,reason,msg,lineInt,paraInt));
-            } else if (!ignoreThisResult && !fail) {
-                tmpResults.add(new PassResult(url,reason,msg,lineInt,paraInt));
-            }
+            results.add(new PassResult(url, msg, msg));
         }
-        return tmpResults;
     }
-
-    private Document parseSoapResponse(String response) {
-        DocumentBuilderFactory docFactory;
-        DocumentBuilder docBuilder;
-        Document document;
-        InputStream stream;
-        try {
-            docFactory = DocumentBuilderFactory.newInstance();
-            docBuilder = docFactory.newDocumentBuilder();
-            stream = new ByteArrayInputStream(response.getBytes("UTF-8"));
-            document = docBuilder.parse(stream);
-            return document;
-        } catch (ParserConfigurationException ex) {
-            System.err.println("ParserConfigurationException Error" + ex.getMessage());
-        } catch (SAXException ex) {
-            System.err.println("SAXException Error" + ex.getMessage());
-        } catch (IOException ex) {
-            System.err.println("IOException Error" + ex.getMessage());
-        }
-        return null;
-    }
-
 }

@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<testsuites errors="0" failures="6" name="suite-results" tests="6" time="0" timestamp="2014/07/03T7:48:57">
+<testsuites errors="0" failures="4" name="suite-results" tests="6" time="0" timestamp="2014/07/03T5:33:34">
   <testsuite id="1" name="suite-results">
     <testcase assertions="1" errors="0" failures="1" name="http://www.madebypi.co.uk/" tests="1" time="0">
-      <failure message=" &lt;div class=&quot;ve html5&quot;&gt;&lt;dl xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;&lt;dt&gt;Attributes for element &lt;a href=&quot;http://www.w3.org/html/wg/drafts/html/master/single-page.html#the-span-element&quot;&gt;&lt;code&gt;span&lt;/code&gt;&lt;/a&gt;:&lt;/dt&gt; &lt;dd&gt;&lt;a href=&quot;http://www.w3.org/html/wg/drafts/html/master/single-page.html#global-attributes&quot;&gt;Global attributes&lt;/a&gt;&lt;/dd&gt; &lt;/dl&gt;&lt;/div&gt; " type="Attribute for not allowed on element span at this point."/>
+      <failure message=" &amp;#60;span class=&amp;#39;contact-us-validation-error&amp;#39; for=&amp;#39;name&amp;#39;&amp;#62;&amp;#60;/span&amp;#62;" type="Attribute for not allowed on element span at this point."/>
     </testcase>
     <testcase assertions="1" errors="0" failures="1" name="http://www.madebypi.co.uk/" tests="1" time="0">
-      <failure message=" &lt;div class=&quot;ve html5&quot;&gt;&lt;dl xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;&lt;dt&gt;Attributes for element &lt;a href=&quot;http://www.w3.org/html/wg/drafts/html/master/single-page.html#the-span-element&quot;&gt;&lt;code&gt;span&lt;/code&gt;&lt;/a&gt;:&lt;/dt&gt; &lt;dd&gt;&lt;a href=&quot;http://www.w3.org/html/wg/drafts/html/master/single-page.html#global-attributes&quot;&gt;Global attributes&lt;/a&gt;&lt;/dd&gt; &lt;/dl&gt;&lt;/div&gt; " type="Attribute for not allowed on element span at this point."/>
+      <failure message=" &amp;#60;span class=&amp;#39;contact-us-validation-error&amp;#39; for=&amp;#39;mail&amp;#39;&amp;#62;&amp;#60;/span&amp;#62;" type="Attribute for not allowed on element span at this point."/>
     </testcase>
     <testcase assertions="1" errors="0" failures="1" name="http://www.madebypi.co.uk/" tests="1" time="0">
-      <failure message=" &lt;div class=&quot;ve html5&quot;&gt;&lt;dl xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;&lt;dt&gt;Attributes for element &lt;a href=&quot;http://www.w3.org/html/wg/drafts/html/master/single-page.html#the-span-element&quot;&gt;&lt;code&gt;span&lt;/code&gt;&lt;/a&gt;:&lt;/dt&gt; &lt;dd&gt;&lt;a href=&quot;http://www.w3.org/html/wg/drafts/html/master/single-page.html#global-attributes&quot;&gt;Global attributes&lt;/a&gt;&lt;/dd&gt; &lt;/dl&gt;&lt;/div&gt; " type="Attribute for not allowed on element span at this point."/>
+      <failure message=" &amp;#60;span class=&amp;#39;contact-us-validation-error&amp;#39; for=&amp;#39;message&amp;#39;&amp;#62;&amp;#60;/span&amp;#62;" type="Attribute for not allowed on element span at this point."/>
     </testcase>
     <testcase assertions="1" errors="0" failures="1" name="http://www.madebypi.co.uk/" tests="1" time="0">
-      <failure message=" &lt;div class=&quot;ve html5&quot;&gt;&lt;dl xmlns=&quot;http://www.w3.org/1999/xhtml&quot;&gt;&lt;dt&gt;Syntax of IRI reference:&lt;/dt&gt;&lt;dd&gt;Any URL. For example: &lt;code&gt;/hello&lt;/code&gt;, &lt;code&gt;#canvas&lt;/code&gt;, or &lt;code&gt;http://example.org/&lt;/code&gt;. Characters should be represented in &lt;a href=&quot;http://www.macchiato.com/unicode/nfc-faq&quot;&gt;NFC&lt;/a&gt; and spaces should be escaped as &lt;code&gt;%20&lt;/code&gt;.&lt;/dd&gt;&lt;/dl&gt;&lt;/div&gt; " type="Bad value mailto:hello@madebypi.co.uk?subject=Hello MadeByPi - Let's talk... for attribute href on element a: Illegal character in query: not a URL code point."/>
+      <failure message="…bypi.co.uk?subject=Hello MadeByPi - Let&amp;#38;#39;s talk...&amp;#34;&amp;#62;hello@madebypi.co.uk&amp;#60;/a&amp;#62;" type="Bad value mailto:hello@madebypi.co.uk?subject=Hello MadeByPi - Let&amp;#39;s talk... for attribute href on element a: Illegal character in query: not a URL code point."/>
     </testcase>
-    <testcase assertions="1" errors="0" failures="1" name="http://www.madebypi.co.uk/" tests="1" time="0">
-      <failure message=" &lt;p class=&quot;helpwanted&quot;&gt; &lt;a href=&quot;feedback.html?uri=;errmsg_id=html5#errormsg&quot; title=&quot;Suggest improvements on this error message through our feedback channels&quot; &gt;&amp;#x2709;&lt;/a&gt; &lt;/p&gt; " type="Section lacks heading. Consider using h2-h6 elements to add identifying headings to all sections."/>
-    </testcase>
-    <testcase assertions="1" errors="0" failures="1" name="http://www.madebypi.co.uk/" tests="1" time="0">
-      <failure message="The file is invalid. Better luck next time!" type=""/>
-    </testcase>
+    <testcase assertions="1" errors="0" failures="0" name="http://www.madebypi.co.uk/" tests="1" time="0"/>
+    <testcase assertions="1" errors="0" failures="0" name="http://www.madebypi.co.uk/" tests="1" time="0"/>
   </testsuite>
 </testsuites>
