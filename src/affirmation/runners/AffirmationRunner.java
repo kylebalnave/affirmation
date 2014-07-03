@@ -50,6 +50,13 @@ public class AffirmationRunner extends Runner {
     public static final String KEY_W3C_CSS_SERVICES = "css";
     public static final String KEY_URLS = "urls";
     public static final String KEY_MESSAGES_TO_IGNORE = "ignore";
+    
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        callRunnerSequence(AffirmationRunner.class, args);
+    }
 
     /**
      * Constructor
