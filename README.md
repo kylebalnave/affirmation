@@ -29,3 +29,21 @@ The below configuration will validate [BBC Homepage](http://www.bbc.co.uk/) and 
             }
         ]
     }	
+
+### Config Explanation	
+
+- w3cServiceUrl
+
+The url to the W3C validation service.
+
+- urls
+
+An array of urls to validate
+
+- ignore
+
+An array of validation errors to ignore from failures.
+
+- reports
+
+Report details for all results
