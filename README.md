@@ -8,6 +8,10 @@ A command line tool and [Semblance][1] Runner that validates HTML using the W3C 
 ### Commandline Usage
 
     java -jar dist/Affirmation.jar -config ./config.json
+    
+### Dependencies
+
+The Semblance.jar [Semblance][1] should be included in the classpaths.
 
 ### Example Config
 
