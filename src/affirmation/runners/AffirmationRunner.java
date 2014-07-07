@@ -16,21 +16,12 @@
  */
 package affirmation.runners;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import java.util.logging.Logger;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import semblance.io.IReader;
 import semblance.io.MultipartURLWriter;
 import semblance.io.ReaderFactory;
@@ -91,20 +82,20 @@ public class AffirmationRunner extends Runner {
             String html = reader.load();
             if (!html.isEmpty()) {
                 MultipartURLWriter loader = new MultipartURLWriter(w3cServiceUrl, "UTF-8");
-                //loader.addFormField("output", "soap12");
                 loader.addFormField("outline", "1");
                 loader.addFormField("charset", "UTF-8");
                 loader.addFormField("doctype", "inline");
                 loader.addFilePart("uploaded_file", url.endsWith("/") ? url + "index.html" : url, html);
                 String response = loader.sendAndReceive();
                 //
-                boolean isValidHtml = false;
                 // create an instance of HtmlCleaner
                 HtmlCleaner cleaner = new HtmlCleaner();
                 TagNode dom = cleaner.clean(response);
                 TagNode[] nodes = dom.getElementsByAttValue("id", "results", true, true);
                 if (nodes.length == 1 && nodes[0].getAttributeByName("class").contains("valid")) {
-                    isValidHtml = true;
+                    Logger.getLogger(getClass().getName()).info(String.format("%s is Valid!", url));
+                } else if (dom.getElementsByAttValue("class", "valid", true, true).length > 0) {
+                    Logger.getLogger(getClass().getName()).info(String.format("%s is Valid!", url));
                 } else if (nodes.length == 1) {
                     results.add(new ErrorResult(url, String.format("Invalid markup '%s'", nodes[0].getText())));
                 } else {
@@ -118,7 +109,9 @@ public class AffirmationRunner extends Runner {
                 results.add(new ErrorResult(url, "File response is empty"));
             }
             // sleep for 1000ms as requested by W3C API
-            Thread.sleep(1000);
+            long sleepMs = 1000;
+            Logger.getLogger(getClass().getName()).info(String.format("Sleep for %sms as requestion by service provider...", sleepMs));
+            Thread.sleep(sleepMs);
         }
         return results;
     }

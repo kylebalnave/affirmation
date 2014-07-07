@@ -1,24 +1,17 @@
 {
-	"w3cServiceUrl" : "http://validator.w3.org/check",
-	"urls": [
-		"http://www.madebypi.co.uk/"
-	],
-	"ignore": [
-		"Syntax of list of link-type keywords",
-		"Mistakes that can cause this error include"
-	],
-	"reports": [
-		{
-			"className" : "semblance.reporters.JunitReport",
-			"out" : "./reports/w3c.junit"
-		},
-                {
-			"className" : "semblance.reporters.XmlReport",
-			"out" : "./reports/w3c.xml"
-		},
-                {
-			"className" : "semblance.reporters.SystemLogReport",
-			"out" : "./reports/log.txt"
-		}
-	]
+    "className":"affirmation.runners.AffirmationRunner",
+    "w3cServiceUrl": "http://validator.w3.org/check",
+    "urls": [
+        "http://www.bbc.co.uk/"
+    ],
+    "ignore": [
+        "Syntax of list of link-type keywords",
+        "Mistakes that can cause this error include"
+    ],
+    "reports": [
+        {
+            "className": "semblance.reporters.JunitReport",
+            "out": "./reports/w3c.junit"
+        }
+    ]
 }	
