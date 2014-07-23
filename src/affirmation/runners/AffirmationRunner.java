@@ -142,19 +142,17 @@ public class AffirmationRunner extends Runner {
     private void addWarnings(TagNode dom, String url) {
         TagNode[] warnings = dom.getElementsByAttValue("class", "msg_warn", true, true);
         for (TagNode node : warnings) {
-            String em = "";
+            String reas = "";
             String msg = "";
             for (TagNode child : node.getChildTags()) {
                 String tName = child.getName();
                 String tText = child.getText().toString();
-                if (em.isEmpty()) {
-                    em = tName.equalsIgnoreCase("em") ? tText : "";
-                }
                 if (msg.isEmpty()) {
-                    msg = tName.equalsIgnoreCase("span") && child.getAttributeByName("class").contains("msg") ? tText : "";
+                    msg = tText;
+                    reas = tText;
                 }
             }
-            results.add(new PassResult(url, msg, msg));
+            results.add(new PassResult(url, msg, reas));
         }
     }
 }
